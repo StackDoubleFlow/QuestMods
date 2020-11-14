@@ -4,14 +4,14 @@
   "info": {
     "name": "MappingExtensions",
     "id": "MappingExtensions",
-    "version": "0.17.3",
-    "url": "https://github.com/zoller27osu/QuestMods",
+    "version": "0.18.0",
+    "url": "https://github.com/StackDoubleFlow/QuestMods",
     "additionalData": {}
   },
   "dependencies": [
     {
       "id": "beatsaber-hook",
-      "versionRange": "^0.7.0",
+      "versionRange": "^0.8.4",
       "additionalData": {
         "extraFiles": [
           "src/inline-hook"
@@ -20,7 +20,7 @@
     },
     {
       "id": "codegen",
-      "versionRange": "^0.3.0",
+      "versionRange": "^0.4.0",
       "additionalData": {}
     }
   ],

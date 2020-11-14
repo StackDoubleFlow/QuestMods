@@ -60,7 +60,7 @@ const Logger& logger()
 extern "C" void setup(ModInfo& info)
 {
     info.id      = "MappingExtensions";
-    info.version = "0.17.3";
+    info.version = "0.18.0";
     modInfo      = info;
     logger().info("Leaving setup!");
 }
