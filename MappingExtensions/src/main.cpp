@@ -51,10 +51,10 @@
 using namespace GlobalNamespace;
 
 ModInfo modInfo;
-const Logger& logger()
+Logger& logger()
 {
-    static const Logger& logger(modInfo);
-    return logger;
+    static auto logger = new Logger(modInfo, LoggerOptions(false, true));
+    return *logger;
 }
 
 extern "C" void setup(ModInfo& info)
@@ -711,72 +711,74 @@ extern "C" void load()
     logger().info("Installing MappingExtensions Hooks!");
     il2cpp_functions::Init();
 
+    Logger& hookLogger = logger();
+
     // hooks to help us get the selected beatmap info
-    INSTALL_HOOK_OFFSETLESS(StandardLevelDetailView_RefreshContent,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, StandardLevelDetailView_RefreshContent,
         il2cpp_utils::FindMethod("", "StandardLevelDetailView", "RefreshContent"));
-    INSTALL_HOOK_OFFSETLESS(MainMenuViewController_DidActivate,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, MainMenuViewController_DidActivate,
         il2cpp_utils::FindMethodUnsafe("", "MainMenuViewController", "DidActivate", 3));
 
     // PC version hooks
-    INSTALL_HOOK_OFFSETLESS(BeatmapObjectData_MirrorLineIndex,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapObjectData_MirrorLineIndex,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectData", "MirrorLineIndex", 1));
-    INSTALL_HOOK_OFFSETLESS(BeatmapObjectSpawnMovementData_GetNoteOffset,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapObjectSpawnMovementData_GetNoteOffset,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectSpawnMovementData", "GetNoteOffset", 2));
-    INSTALL_HOOK_OFFSETLESS(BeatmapObjectSpawnMovementData_HighestJumpPosYForLineLayer,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapObjectSpawnMovementData_HighestJumpPosYForLineLayer,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectSpawnMovementData", "HighestJumpPosYForLineLayer", 1));
-    INSTALL_HOOK_OFFSETLESS(BeatmapObjectSpawnMovementData_LineYPosForLineLayer,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapObjectSpawnMovementData_LineYPosForLineLayer,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectSpawnMovementData", "LineYPosForLineLayer", 1));
-    INSTALL_HOOK_OFFSETLESS(BeatmapObjectSpawnMovementData_Get2DNoteOffset,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapObjectSpawnMovementData_Get2DNoteOffset,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectSpawnMovementData", "Get2DNoteOffset", 2));
-    INSTALL_HOOK_OFFSETLESS(FlyingScoreSpawner_SpawnFlyingScore,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, FlyingScoreSpawner_SpawnFlyingScore,
         il2cpp_utils::FindMethodUnsafe("", "FlyingScoreSpawner", "SpawnFlyingScore", 7));
-    INSTALL_HOOK_OFFSETLESS(NoteCutDirectionExtensions_RotationAngle,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, NoteCutDirectionExtensions_RotationAngle,
         il2cpp_utils::FindMethodUnsafe("", "NoteCutDirectionExtensions", "RotationAngle", 1));
-    INSTALL_HOOK_OFFSETLESS(NoteCutDirectionExtensions_Direction,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, NoteCutDirectionExtensions_Direction,
         il2cpp_utils::FindMethodUnsafe("", "NoteCutDirectionExtensions", "Direction", 1));
-    INSTALL_HOOK_OFFSETLESS(NoteData_MirrorLineIndex,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, NoteData_MirrorLineIndex,
         il2cpp_utils::FindMethodUnsafe("", "NoteData", "MirrorLineIndex", 1));
-    INSTALL_HOOK_OFFSETLESS(NoteData_MirrorTransformCutDirection,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, NoteData_MirrorTransformCutDirection,
         il2cpp_utils::FindMethod("", "NoteData", "MirrorTransformCutDirection"));
-    INSTALL_HOOK_OFFSETLESS(ObstacleController_Init,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, ObstacleController_Init,
         il2cpp_utils::FindMethodUnsafe("", "ObstacleController", "Init", 9));
-    INSTALL_HOOK_OFFSETLESS(ObstacleData_MirrorLineIndex,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, ObstacleData_MirrorLineIndex,
         il2cpp_utils::FindMethodUnsafe("", "ObstacleData", "MirrorLineIndex", 1));
-    INSTALL_HOOK_OFFSETLESS(SpawnRotationProcessor_RotationForEventValue,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, SpawnRotationProcessor_RotationForEventValue,
         il2cpp_utils::FindMethodUnsafe("", "SpawnRotationProcessor", "RotationForEventValue", 1));
 
     // Clampers
     // These work together to do the job of https://github.com/Kylemc1413/SongCore/blob/4f7dd66e022cf3f8296e26ea81e39ac1be3cc461/HarmonyPatches/ClampPatches.cs#L10-L50
-    INSTALL_HOOK_OFFSETLESS(BeatmapData_AddBeatmapObjectData,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapData_AddBeatmapObjectData,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapData", "AddBeatmapObjectData", 1));
-    INSTALL_HOOK_OFFSETLESS(BeatmapLineData_AddBeatmapObjectData,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapLineData_AddBeatmapObjectData,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapLineData", "AddBeatmapObjectData", 1));
 
-    INSTALL_HOOK_OFFSETLESS(NotesInTimeRowProcessor_ProcessAllNotesInTimeRow,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, NotesInTimeRowProcessor_ProcessAllNotesInTimeRow,
         il2cpp_utils::FindMethodUnsafe("", "NotesInTimeRowProcessor", "ProcessAllNotesInTimeRow", 1));
 
     // The next 3 hooks work together to do the job of the CreateTransformedData hook in the PC version
-    INSTALL_HOOK_OFFSETLESS(NoteData_GetCopy, il2cpp_utils::FindMethod("", "NoteData", "GetCopy"));
-    INSTALL_HOOK_OFFSETLESS(ObstacleData_GetCopy, il2cpp_utils::FindMethod("", "ObstacleData", "GetCopy"));
+    INSTALL_HOOK_OFFSETLESS(hookLogger, NoteData_GetCopy, il2cpp_utils::FindMethod("", "NoteData", "GetCopy"));
+    INSTALL_HOOK_OFFSETLESS(hookLogger, ObstacleData_GetCopy, il2cpp_utils::FindMethod("", "ObstacleData", "GetCopy"));
     // The next 4 hooks are the users of BeatmapData.beatmapObjectsData's getter, which uses the lineIndex on arrays.
-    INSTALL_HOOK_OFFSETLESS(BeatmapDataMirrorTransform_CreateTransformedData,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapDataMirrorTransform_CreateTransformedData,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapDataMirrorTransform", "CreateTransformedData", 1));
 
-    INSTALL_HOOK_OFFSETLESS(BeatmapDataObstaclesAndBombsTransform_CreateTransformedData,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapDataObstaclesAndBombsTransform_CreateTransformedData,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapDataObstaclesAndBombsTransform", "CreateTransformedData", 3));
 
-    INSTALL_HOOK_OFFSETLESS(BeatmapData_CopyBeatmapObjects,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapData_CopyBeatmapObjects,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapData", "CopyBeatmapObjects", 2));
 
-    INSTALL_HOOK_OFFSETLESS(BeatmapDataNoArrowsTransform_CreateTransformedData,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapDataNoArrowsTransform_CreateTransformedData,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapDataNoArrowsTransform", "CreateTransformedData", 1));
     // end of clampers
 
     // ???
-    INSTALL_HOOK_OFFSETLESS(BeatmapObjectSpawnController_Init,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapObjectSpawnController_Init,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectSpawnController/InitData", ".ctor", 5));
 
-    INSTALL_HOOK_OFFSETLESS(BeatmapObjectExecutionRatingsRecorder_HandleObstacleDidPassAvoidedMark,
+    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapObjectExecutionRatingsRecorder_HandleObstacleDidPassAvoidedMark,
         il2cpp_utils::FindMethodUnsafe("", "BeatmapObjectExecutionRatingsRecorder", "HandleObstacleDidPassAvoidedMark", 1));
 
     logger().info("Installed MappingExtensions Hooks!");
