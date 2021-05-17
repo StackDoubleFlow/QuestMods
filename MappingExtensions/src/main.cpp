@@ -26,6 +26,7 @@
 #include "GlobalNamespace/BeatmapSaveData_EventData.hpp"
 #include "GlobalNamespace/BeatmapSaveData_NoteData.hpp"
 #include "GlobalNamespace/BeatmapSaveData_ObstacleData.hpp"
+#include "GlobalNamespace/ColorManager.hpp"
 #include "GlobalNamespace/IDifficultyBeatmap.hpp"
 #include "GlobalNamespace/IDifficultyBeatmapSet.hpp"
 #include "GlobalNamespace/NoteCutDirectionExtensions.hpp"
@@ -362,7 +363,7 @@ MAKE_HOOK_OFFSETLESS(ObstacleController_Init, void, ObstacleController* self, Ob
         multiplier = (float)obsHeight / 1000;
     }
 
-    self->stretchableObstacle->SetSizeAndColor((num * 0.98f), (height * multiplier), length, self->color->color);
+    self->stretchableObstacle->SetSizeAndColor((num * 0.98f), (height * multiplier), length, self->colorManager->get_obstaclesColor());
     self->bounds = self->stretchableObstacle->bounds;
 }
 
@@ -746,33 +747,6 @@ extern "C" void load()
         il2cpp_utils::FindMethodUnsafe("", "ObstacleData", "MirrorLineIndex", 1));
     INSTALL_HOOK_OFFSETLESS(hookLogger, SpawnRotationProcessor_RotationForEventValue,
         il2cpp_utils::FindMethodUnsafe("", "SpawnRotationProcessor", "RotationForEventValue", 1));
-
-    // Clampers
-    // These work together to do the job of https://github.com/Kylemc1413/SongCore/blob/4f7dd66e022cf3f8296e26ea81e39ac1be3cc461/HarmonyPatches/ClampPatches.cs#L10-L50
-    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapData_AddBeatmapObjectData,
-        il2cpp_utils::FindMethodUnsafe("", "BeatmapData", "AddBeatmapObjectData", 1));
-    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapLineData_AddBeatmapObjectData,
-        il2cpp_utils::FindMethodUnsafe("", "BeatmapLineData", "AddBeatmapObjectData", 1));
-
-    INSTALL_HOOK_OFFSETLESS(hookLogger, NotesInTimeRowProcessor_ProcessAllNotesInTimeRow,
-        il2cpp_utils::FindMethodUnsafe("", "NotesInTimeRowProcessor", "ProcessAllNotesInTimeRow", 1));
-
-    // The next 3 hooks work together to do the job of the CreateTransformedData hook in the PC version
-    INSTALL_HOOK_OFFSETLESS(hookLogger, NoteData_GetCopy, il2cpp_utils::FindMethod("", "NoteData", "GetCopy"));
-    INSTALL_HOOK_OFFSETLESS(hookLogger, ObstacleData_GetCopy, il2cpp_utils::FindMethod("", "ObstacleData", "GetCopy"));
-    // The next 4 hooks are the users of BeatmapData.beatmapObjectsData's getter, which uses the lineIndex on arrays.
-    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapDataMirrorTransform_CreateTransformedData,
-        il2cpp_utils::FindMethodUnsafe("", "BeatmapDataMirrorTransform", "CreateTransformedData", 1));
-
-    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapDataObstaclesAndBombsTransform_CreateTransformedData,
-        il2cpp_utils::FindMethodUnsafe("", "BeatmapDataObstaclesAndBombsTransform", "CreateTransformedData", 3));
-
-    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapData_CopyBeatmapObjects,
-        il2cpp_utils::FindMethodUnsafe("", "BeatmapData", "CopyBeatmapObjects", 2));
-
-    INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapDataNoArrowsTransform_CreateTransformedData,
-        il2cpp_utils::FindMethodUnsafe("", "BeatmapDataNoArrowsTransform", "CreateTransformedData", 1));
-    // end of clampers
 
     // ???
     INSTALL_HOOK_OFFSETLESS(hookLogger, BeatmapObjectSpawnController_Init,
